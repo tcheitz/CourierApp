@@ -18,3 +18,8 @@ To run the Application, run
     java -jar target/CourierApp-1.0-SNAPSHOT.jar <inputfile>
 
 Input file should be given as an argument, application reads inputs from the specified .txt file. The file should be placed in _**src/main/resources/input_files**_ folder.
+
+### Models
+
+Create models to group respective fields for each Object.
+Namely, **Offer** model, **Package** model, **Vehicle** model in a model package.
