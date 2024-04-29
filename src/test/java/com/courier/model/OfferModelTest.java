@@ -16,4 +16,5 @@ public class OfferModelTest {
         });
         assertEquals("Distance, weight and discount values should be positive",exception.getMessage());
     }
+
 }

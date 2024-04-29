@@ -45,5 +45,9 @@ public class PackageModelTest {
     void shouldNotThrowExceptionForZeroDecimals(){
         assertDoesNotThrow(()->new Package("PKG62",0.8,0.56,"OFR022"));
     }
-
+    @Test
+    void intiallyOfferShouldNotBeApplied(){
+        aPackage = new Package("PKG378",78,67,"OFR003");
+        assertFalse(aPackage.isOfferApplied());
+    }
 }
