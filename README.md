@@ -19,7 +19,19 @@ To run the Application, run
 
 Input file should be given as an argument, application reads inputs from the specified .txt file. The file should be placed in _**src/main/resources/input_files**_ folder.
 
+### Tests
+
+Tests are created in the **src/test/java/com.courier** location. Tests are created before functionalities, covering edge cases.
+Run tests with below command:
+
+    mvn test
+
 ### Models
 
 Create models to group respective fields for each Object.
 Namely, **Offer** model, **Package** model, **Vehicle** model in a model package.
+
+### Services
+
+Create **PackageService** to include operations such as calculating discount for applicable offers, total cost for each package, loading packages into vehicles, and estimating time for each package.
+Implementation of these functionalites only by passing respective tests.
