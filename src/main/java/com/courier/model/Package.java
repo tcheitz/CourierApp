@@ -9,9 +9,11 @@ public class Package {
     private double discount;
     private double totalCost;
     private Vehicle vehicle;
+    double estimatedDeliveryTime;
+
 
     public Package(String id, double weight, double distance) {
-        validatePackage(weight,distance);
+        validatePackage(weight, distance);
         this.id = id;
         this.weight = weight;
         this.distance = distance;
@@ -19,15 +21,18 @@ public class Package {
 
 
     public Package(String id, double weight, double distance, String offerCode) {
-        validatePackage(weight,distance);
+        validatePackage(weight, distance);
         this.id = id;
         this.weight = weight;
         this.distance = distance;
         this.offerCode = offerCode;
     }
-    private static void validatePackage(double weight, double distance){
-        if(weight<=0 || distance<=0) throw new IllegalArgumentException("Weight, distance values should be more than zero");
+
+    private static void validatePackage(double weight, double distance) {
+        if (weight <= 0 || distance <= 0)
+            throw new IllegalArgumentException("Weight, distance values should be more than zero");
     }
+
     public String getId() {
         return id;
     }
@@ -90,5 +95,13 @@ public class Package {
 
     public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
+    }
+
+    public double getEstimatedDeliveryTime() {
+        return estimatedDeliveryTime;
+    }
+
+    public void setEstimatedDeliveryTime(double estimatedDeliveryTime) {
+        this.estimatedDeliveryTime = estimatedDeliveryTime;
     }
 }

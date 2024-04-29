@@ -2,18 +2,22 @@ package com.courier.service;
 
 import com.courier.model.Offer;
 import com.courier.model.Package;
+import com.courier.model.Vehicle;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class PackageService {
     public double calculatePackageCost(Package aPackage, double baseDeliveryCost) {
-        return baseDeliveryCost+(aPackage.getWeight()*10)+(aPackage.getDistance());
+        return baseDeliveryCost + (aPackage.getWeight() * 10) + (aPackage.getDistance()*5);
     }
+
     private static double calculateDiscountedPrice(double basePrice, double discountPercentage) {
         return basePrice * (1 - discountPercentage / 100);
     }
+
     public double applyOffer(Package aPackage, Offer offer, double baseDeliveryCost) {
         double packageCost = calculatePackageCost(aPackage, baseDeliveryCost);
         if (offer.getMinimumWeight() <= aPackage.getWeight() && offer.getMaximumWeight() >= aPackage.getWeight() &&
@@ -23,7 +27,8 @@ public class PackageService {
         }
         return packageCost;
     }
-    public static List<Package> filterPackages(List<Package> packages, double maximumCarryingWeight) {
+
+    public List<Package> filterPackages(List<Package> packages, double maximumCarryingWeight) {
 
         List<Package> currentTrip = new ArrayList<>();
         List<Package> tempPackages = new ArrayList<>();
@@ -63,5 +68,24 @@ public class PackageService {
         }
 
         return currentTrip;
+    }
+    public void loadPackages(Vehicle vehicle, List<Package> newPack, int maxCarriableWeight, Package[] packages, double currentTime) {
+        List<Package> packageList = filterPackages(newPack, maxCarriableWeight);
+        vehicle.setPackages(packageList);
+
+        Package longestDelivery = packageList.stream().max(Comparator.comparing(pkg -> pkg.getDistance())).get();
+
+
+        for (Package pkg : packageList) {
+            newPack.removeIf(p -> p.getId() == pkg.getId());
+            for (Package orgPkg : packages) {
+                if (pkg.getId() == orgPkg.getId()) {
+                    orgPkg.setVehicle(vehicle);
+                    orgPkg.setEstimatedDeliveryTime(currentTime + orgPkg.getDistance() / vehicle.getMaximumSpeed());
+                    break;
+                }
+            }
+        }
+        vehicle.setReturnTime(currentTime + vehicle.getReturnTime() + 2 * ( longestDelivery.getDistance() / vehicle.getMaximumSpeed()));
     }
 }

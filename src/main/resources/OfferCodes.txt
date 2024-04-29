@@ -1,0 +1,4 @@
+code minimumDistance(km) maximumDistance(km) minimumWeight(kg) maximumWeight(kg) discount(%)
+OFR001 0 200 70 200 10
+OFR002 50 150 100 250 7
+OFR003 50 250 10 150 5
