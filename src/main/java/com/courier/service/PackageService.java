@@ -68,23 +68,4 @@ public class PackageService {
 
         return currentTrip;
     }
-
-    public void loadPackages(Vehicle vehicle, List<Package> currentTripPackageList, int maxCarriableWeight, Package[] packages, double currentTime) {
-        List<Package> packageList = filterPackages(currentTripPackageList, maxCarriableWeight);
-        vehicle.setPackages(packageList);
-
-        Package longestDelivery = packageList.stream().max(Comparator.comparing(pkg -> pkg.getDistance())).get();
-
-        for (Package aPackage : packageList) {
-            for (Package originalPackage : packages) {
-                if (aPackage.getId() == originalPackage.getId()) {
-                    originalPackage.setVehicle(vehicle);
-                    originalPackage.setEstimatedDeliveryTime(currentTime + originalPackage.getDistance() / vehicle.getMaximumSpeed());
-                    break;
-                }
-            }
-            currentTripPackageList.removeIf(pkg -> pkg.getId() == aPackage.getId());
-        }
-        vehicle.setReturnTime(currentTime + 2 * (longestDelivery.getDistance() / vehicle.getMaximumSpeed()));
-    }
 }

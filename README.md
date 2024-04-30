@@ -39,5 +39,8 @@ Namely, **Offer** model, **Package** model, **Vehicle** model in a model package
 
 ### Services
 
-Create **PackageService** to include operations such as calculating discount for applicable offers, total cost for each package, loading packages into vehicles, and estimating time for each package.
-Implementation of these functionalites only by passing respective tests.
+**PackageService**: to include operations such as calculating discount for applicable offers, total cost for each package, and filtering packages by more packages, more weights, less distance for efficiency of delivery.
+
+**OfferService**: to register offers from OfferCodes.txt file
+
+**VehicleService** to ship packages by tagging to vehicles, and estimating time for each package.

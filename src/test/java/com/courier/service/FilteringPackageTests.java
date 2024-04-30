@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.courier.service.VehicleService.shippingPackages;
+import static com.courier.service.VehicleService.shipPackages;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FilteringPackageTests {
@@ -62,7 +62,7 @@ public class FilteringPackageTests {
 
         Double[] estimationTimings = {pkg1Time, pkg2Time, pkg3Time, pkg4Time, pkg5Time};
 
-        shippingPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight, packageService);
+        shipPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight, packageService);
         for (int i = 0; i < packages.length; i++) {
             assertEquals(estimationTimings[i], packages[i].getEstimatedDeliveryTime(), 0.025);
         }
@@ -86,7 +86,7 @@ public class FilteringPackageTests {
 
         Double[] estimationTimings = {pkg1Time, pkg2Time, pkg3Time};
 
-        shippingPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight, packageService);
+        shipPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight, packageService);
         for (int i = 0; i < packages.length; i++) {
             assertEquals(estimationTimings[i], packages[i].getEstimatedDeliveryTime(), 0.025);
         }

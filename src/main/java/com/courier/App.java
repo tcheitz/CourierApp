@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import static com.courier.service.OfferService.loadOffers;
-import static com.courier.service.VehicleService.shippingPackages;
+import static com.courier.service.VehicleService.shipPackages;
 
 
 public class App {
@@ -65,7 +65,7 @@ public class App {
                     int maximumSpeed = Integer.parseInt(vehicleInfo[1]);
                     int maximumCarryingWeight = Integer.parseInt(vehicleInfo[2]);
 
-                    shippingPackages(packages, numberOfVehicles, maximumSpeed, maximumCarryingWeight, packageService);
+                    shipPackages(packages, numberOfVehicles, maximumSpeed, maximumCarryingWeight, packageService);
 
                     for (Package orgPkg : packages) {
                         System.out.printf("%s %.0f %.0f %.2f\n", orgPkg.getId(), orgPkg.getDiscount(), orgPkg.getTotalCost(), orgPkg.getEstimatedDeliveryTime());
