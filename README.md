@@ -3,7 +3,7 @@ Small Distance Courier Service
 
 ### Run the project
 
-Firstly, let's build it with 
+Build the project with 
     
     mvn package
 
