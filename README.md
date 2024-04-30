@@ -1,4 +1,4 @@
-# Courier Application
+# Courier Service
 Small Distance Courier Service
 
 ### Run the project
