@@ -11,7 +11,7 @@ import java.util.List;
 
 public class PackageService {
     public double calculatePackageCost(Package aPackage, double baseDeliveryCost) {
-        return baseDeliveryCost + (aPackage.getWeight() * 10) + (aPackage.getDistance()*5);
+        return baseDeliveryCost + (aPackage.getWeight() * 10) + (aPackage.getDistance() * 5);
     }
 
     private static double calculateDiscountedPrice(double basePrice, double discountPercentage) {
@@ -40,7 +40,7 @@ public class PackageService {
             packages.removeAll(currentTrip);
             return currentTrip;
         }
-        // Sort the list in descending order
+
         Collections.sort(packages, (currentPackage, Nextpackage) -> {
             if (Nextpackage.getWeight() == currentPackage.getWeight())
                 return Double.compare(currentPackage.getDistance(), Nextpackage.getDistance());
@@ -50,7 +50,6 @@ public class PackageService {
         for (int i = 0; i < packages.size(); i++) {
             totalWeight = packages.get(i).getWeight();
             tempPackages.add(packages.get(i));
-
             for (int j = i + 1; j < packages.size(); j++) {
                 if (totalWeight + packages.get(j).getWeight() <= maximumCarryingWeight) {
                     totalWeight += packages.get(j).getWeight();
@@ -69,23 +68,23 @@ public class PackageService {
 
         return currentTrip;
     }
-    public void loadPackages(Vehicle vehicle, List<Package> newPack, int maxCarriableWeight, Package[] packages, double currentTime) {
-        List<Package> packageList = filterPackages(newPack, maxCarriableWeight);
+
+    public void loadPackages(Vehicle vehicle, List<Package> currentTripPackageList, int maxCarriableWeight, Package[] packages, double currentTime) {
+        List<Package> packageList = filterPackages(currentTripPackageList, maxCarriableWeight);
         vehicle.setPackages(packageList);
 
         Package longestDelivery = packageList.stream().max(Comparator.comparing(pkg -> pkg.getDistance())).get();
 
-
-        for (Package pkg : packageList) {
-            newPack.removeIf(p -> p.getId() == pkg.getId());
-            for (Package orgPkg : packages) {
-                if (pkg.getId() == orgPkg.getId()) {
-                    orgPkg.setVehicle(vehicle);
-                    orgPkg.setEstimatedDeliveryTime(currentTime + orgPkg.getDistance() / vehicle.getMaximumSpeed());
+        for (Package aPackage : packageList) {
+            for (Package originalPackage : packages) {
+                if (aPackage.getId() == originalPackage.getId()) {
+                    originalPackage.setVehicle(vehicle);
+                    originalPackage.setEstimatedDeliveryTime(currentTime + originalPackage.getDistance() / vehicle.getMaximumSpeed());
                     break;
                 }
             }
+            currentTripPackageList.removeIf(pkg -> pkg.getId() == aPackage.getId());
         }
-        vehicle.setReturnTime(currentTime + vehicle.getReturnTime() + 2 * ( longestDelivery.getDistance() / vehicle.getMaximumSpeed()));
+        vehicle.setReturnTime(currentTime + 2 * (longestDelivery.getDistance() / vehicle.getMaximumSpeed()));
     }
 }

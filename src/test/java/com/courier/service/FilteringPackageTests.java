@@ -1,14 +1,13 @@
 package com.courier.service;
 
 import com.courier.model.Package;
-import com.courier.model.Vehicle;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
+import static com.courier.service.VehicleService.shippingPackages;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FilteringPackageTests {
@@ -29,8 +28,8 @@ public class FilteringPackageTests {
         List<Package> packageList = new ArrayList<>(Arrays.asList(packages));
         List<String> filteredPackageIds = new ArrayList<>();
         while (!packageList.isEmpty()) {
-            List<Package> shippingPackages = packageService.filterPackages(packageList, maximumCarryingWeight);
-            for (Package aPackage : shippingPackages) {
+            List<Package> shippingPackagesList = packageService.filterPackages(packageList, maximumCarryingWeight);
+            for (Package aPackage : shippingPackagesList) {
                 filteredPackageIds.add(aPackage.getId());
                 packageList.removeIf(p -> p.getId() == aPackage.getId());
             }
@@ -40,44 +39,61 @@ public class FilteringPackageTests {
     }
 
     @Test
-    void testDeliveryEstimationTime() {
+    void testDeliveryEstimationTimeDifferentWeights() {
         Package[] packages = new Package[5];
         packages[0] = (new Package("PKG1", 50, 30, "OFR001"));
         packages[1] = ((new Package("PKG2", 75, 125, "OFR008")));
         packages[2] = (new Package("PKG3", 175, 100, "OFR003"));
         packages[3] = (new Package("PKG4", 110, 60, "OFR002"));
         packages[4] = (new Package("PKG5", 155, 95, "NA"));
-        maximumCarryingWeight = 200;
-        Double[] estimationTimings = {3.98, 1.78, 1.42, 0.85, 4.19};
+
         int numberOfVehicles = 2;
         int maxSpeed = 70;
         int maximumCarryingWeight = 200;
-        List<Package> newPack = new ArrayList<>(Arrays.asList(packages));
-        Vehicle[] vehicles = new Vehicle[numberOfVehicles];
+
         double currentTime = 0;
+        double pkg4Time = packages[3].getDistance() / maxSpeed;
+        double pkg2Time = packages[1].getDistance() / maxSpeed;
+        double pkg3Time = packages[2].getDistance() / maxSpeed;
+        currentTime = 2 * pkg3Time;
+        double pkg5Time = currentTime + packages[4].getDistance() / maxSpeed;
+        currentTime = 2 * pkg2Time;
+        double pkg1Time = currentTime + packages[0].getDistance() / maxSpeed;
 
-        for (int i = 0; i < numberOfVehicles && newPack.size() != 0; i++) {
-            vehicles[i] = new Vehicle(maxSpeed);
-            packageService.loadPackages(vehicles[i], newPack, maximumCarryingWeight, packages, currentTime);
-        }
-        while (newPack.size() != 0) {
+        Double[] estimationTimings = {pkg1Time, pkg2Time, pkg3Time, pkg4Time, pkg5Time};
 
-            Vehicle nextVehicle = Arrays.stream(vehicles).min(Comparator.comparing(v -> v.getReturnTime())).get();
-            for (Vehicle vehicle : vehicles) {
-                if (vehicle != nextVehicle)
-                    vehicle.setReturnTime(vehicle.getReturnTime() - nextVehicle.getReturnTime());
-
-            }
-            currentTime = currentTime + nextVehicle.getReturnTime();
-            packageService.loadPackages(nextVehicle, newPack, maximumCarryingWeight, packages, currentTime);
-        }
+        shippingPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight, packageService);
         for (int i = 0; i < packages.length; i++) {
             assertEquals(estimationTimings[i], packages[i].getEstimatedDeliveryTime(), 0.025);
         }
     }
 
     @Test
-    void shouldFilterLeastDistanceIfEqualweights() {
+    void testDeliveryEstimationTimeEqualWeights() {
+        Package[] packages = new Package[3];
+        packages[0] = (new Package("PKG1", 50, 50, "OFR001"));
+        packages[1] = ((new Package("PKG2", 50, 120, "OFR008")));
+        packages[2] = (new Package("PKG3", 50, 100, "OFR003"));
+        int numberOfVehicles = 1;
+        int maxSpeed = 70;
+        int maximumCarryingWeight = 60;
+
+        double pkg1Time = packages[0].getDistance() / maxSpeed;
+        double currentTime = 2 * pkg1Time;
+        double pkg3Time = currentTime + packages[2].getDistance() / maxSpeed;
+        currentTime = currentTime + 2 * packages[2].getDistance() / maxSpeed;
+        double pkg2Time = currentTime + packages[1].getDistance() / maxSpeed;
+
+        Double[] estimationTimings = {pkg1Time, pkg2Time, pkg3Time};
+
+        shippingPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight, packageService);
+        for (int i = 0; i < packages.length; i++) {
+            assertEquals(estimationTimings[i], packages[i].getEstimatedDeliveryTime(), 0.025);
+        }
+    }
+
+    @Test
+    void shouldFilterLeastDistanceIfEqualWeights() {
         List<Package> packages = new ArrayList<>();
         packages.add(new Package("PKG1", 50, 50));
         packages.add(new Package("PKG2", 50, 120));
