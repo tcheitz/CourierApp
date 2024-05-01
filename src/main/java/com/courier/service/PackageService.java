@@ -3,14 +3,15 @@ package com.courier.service;
 import com.courier.model.Offer;
 import com.courier.model.Package;
 import com.courier.model.Vehicle;
-
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class PackageService {
-    public double calculatePackageCost(Package aPackage, double baseDeliveryCost) {
+    public static double calculatePackageCost(Package aPackage, double baseDeliveryCost) {
         return baseDeliveryCost + (aPackage.getWeight() * 10) + (aPackage.getDistance() * 5);
     }
 
@@ -18,7 +19,7 @@ public class PackageService {
         return basePrice * (1 - discountPercentage / 100);
     }
 
-    public double applyOffer(Package aPackage, Offer offer, double baseDeliveryCost) {
+    public static double applyOffer(Package aPackage, Offer offer, double baseDeliveryCost) {
         double packageCost = calculatePackageCost(aPackage, baseDeliveryCost);
         if (offer.getMinimumWeight() <= aPackage.getWeight() && offer.getMaximumWeight() >= aPackage.getWeight() &&
                 offer.getMinimumDistance() <= aPackage.getDistance() && offer.getMaximumDistance() >= aPackage.getDistance()) {
@@ -67,5 +68,36 @@ public class PackageService {
         }
 
         return currentTrip;
+    }
+    public static Package  readPackage(BufferedReader testCasesReader, List<Offer> offers, double baseDeliveryCost) throws IOException {
+        String[] packageInfo = testCasesReader.readLine().split("\\s+");
+        String pkgId = packageInfo[0];
+        int weight = Integer.parseInt(packageInfo[1]);
+        int distance = Integer.parseInt(packageInfo[2]);
+        String offerCode = packageInfo.length >= 4 ? packageInfo[3] : "";
+        double totalCost = baseDeliveryCost;
+        double discount = 0;
+        Package pkg;
+
+        if (offerCode != "") {
+            pkg = new Package(pkgId, weight, distance, offerCode);
+            for (Offer offer : offers) {
+                if (offer.getCode().equals(pkg.getOfferCode())) {
+                    totalCost = applyOffer(pkg, offer, baseDeliveryCost);
+                    discount = calculatePackageCost(pkg, baseDeliveryCost) - totalCost;
+                    break;
+                }
+            }
+        } else {
+            pkg = new Package(pkgId, weight, distance);
+        }
+
+        if (!pkg.isOfferApplied())
+            totalCost = calculatePackageCost(pkg, baseDeliveryCost);
+
+        pkg.setDiscount(discount);
+        pkg.setTotalCost(totalCost);
+
+        return pkg;
     }
 }
