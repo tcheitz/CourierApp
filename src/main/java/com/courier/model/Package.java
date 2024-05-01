@@ -37,24 +37,12 @@ public class Package {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
-        this.weight = weight;
-    }
-
     public double getDistance() {
         return distance;
-    }
-
-    public void setDistance(double distance) {
-        this.distance = distance;
     }
 
     public boolean isOfferApplied() {
@@ -67,10 +55,6 @@ public class Package {
 
     public String getOfferCode() {
         return offerCode;
-    }
-
-    public void setOfferCode(String offerCode) {
-        this.offerCode = offerCode;
     }
 
     public double getDiscount() {
@@ -87,10 +71,6 @@ public class Package {
 
     public void setTotalCost(double totalCost) {
         this.totalCost = totalCost;
-    }
-
-    public Vehicle getVehicle() {
-        return vehicle;
     }
 
     public void setVehicle(Vehicle vehicle) {

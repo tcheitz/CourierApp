@@ -23,47 +23,23 @@ public class Offer {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public int getMinimumDistance() {
         return minimumDistance;
-    }
-
-    public void setMinimumDistance(int minimumDistance) {
-        this.minimumDistance = minimumDistance;
     }
 
     public int getMaximumDistance() {
         return maximumDistance;
     }
 
-    public void setMaximumDistance(int maximumDistance) {
-        this.maximumDistance = maximumDistance;
-    }
-
     public int getMinimumWeight() {
         return minimumWeight;
-    }
-
-    public void setMinimumWeight(int minimumWeight) {
-        this.minimumWeight = minimumWeight;
     }
 
     public int getMaximumWeight() {
         return maximumWeight;
     }
 
-    public void setMaximumWeight(int maximumWeight) {
-        this.maximumWeight = maximumWeight;
-    }
-
     public int getDiscountPercentage() {
         return discountPercentage;
-    }
-
-    public void setDiscountPercentage(int discountPercentage) {
-        this.discountPercentage = discountPercentage;
     }
 }

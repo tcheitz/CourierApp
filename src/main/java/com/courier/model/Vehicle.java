@@ -18,14 +18,6 @@ public class Vehicle {
         return maximumSpeed;
     }
 
-    public void setMaximumSpeed(int maximumSpeed) {
-        this.maximumSpeed = maximumSpeed;
-    }
-
-    public List<Package> getPackages() {
-        return packages;
-    }
-
     public void setPackages(List<Package> packages) {
         this.packages = packages;
     }
