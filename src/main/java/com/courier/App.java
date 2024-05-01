@@ -50,7 +50,7 @@ public class App {
             int maximumSpeed = Integer.parseInt(vehicleInfo[1]);
             int maximumCarryingWeight = Integer.parseInt(vehicleInfo[2]);
 
-            shipPackages(packages, numberOfVehicles, maximumSpeed, maximumCarryingWeight, packageService);
+            shipPackages(packages, numberOfVehicles, maximumSpeed, maximumCarryingWeight);
 
             for (Package orgPkg : packages) {
                 System.out.printf("%s %.0f %.0f %.2f\n", orgPkg.getId(), orgPkg.getDiscount(), orgPkg.getTotalCost(), orgPkg.getEstimatedDeliveryTime());

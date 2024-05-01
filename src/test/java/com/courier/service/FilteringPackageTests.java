@@ -62,7 +62,7 @@ public class FilteringPackageTests {
 
         Double[] estimationTimings = {pkg1Time, pkg2Time, pkg3Time, pkg4Time, pkg5Time};
 
-        shipPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight, packageService);
+        shipPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight);
         for (int i = 0; i < packages.length; i++) {
             assertEquals(estimationTimings[i], packages[i].getEstimatedDeliveryTime(), 0.025);
         }
@@ -86,7 +86,7 @@ public class FilteringPackageTests {
 
         Double[] estimationTimings = {pkg1Time, pkg2Time, pkg3Time};
 
-        shipPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight, packageService);
+        shipPackages(packages, numberOfVehicles, maxSpeed, maximumCarryingWeight);
         for (int i = 0; i < packages.length; i++) {
             assertEquals(estimationTimings[i], packages[i].getEstimatedDeliveryTime(), 0.025);
         }
