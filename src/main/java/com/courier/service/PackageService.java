@@ -2,12 +2,11 @@ package com.courier.service;
 
 import com.courier.model.Offer;
 import com.courier.model.Package;
-import com.courier.model.Vehicle;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class PackageService {
@@ -33,8 +32,7 @@ public class PackageService {
 
         List<Package> currentTrip = new ArrayList<>();
         List<Package> tempPackages = new ArrayList<>();
-        double totalWeight = 0;
-        double maxWeight = 0;
+
 
         if (packages.size() == 1) {
             currentTrip = new ArrayList<>(packages);
@@ -42,34 +40,48 @@ public class PackageService {
             return currentTrip;
         }
 
-        Collections.sort(packages, (currentPackage, Nextpackage) -> {
-            if (Nextpackage.getWeight() == currentPackage.getWeight())
-                return Double.compare(currentPackage.getDistance(), Nextpackage.getDistance());
-            return Double.compare(Nextpackage.getWeight(), currentPackage.getWeight());
-        });
+        sortPackagesByWeightDescendingAndDistanceAscending(packages);
 
         for (int i = 0; i < packages.size(); i++) {
-            totalWeight = packages.get(i).getWeight();
-            tempPackages.add(packages.get(i));
-            for (int j = i + 1; j < packages.size(); j++) {
-                if (totalWeight + packages.get(j).getWeight() <= maximumCarryingWeight) {
-                    totalWeight += packages.get(j).getWeight();
-                    tempPackages.add(packages.get(j));
-                } else if (totalWeight > maxWeight) {
-                    maxWeight = totalWeight;
-                } else if (totalWeight < packages.get(j).getWeight() && tempPackages.size() == 0) {
-                    tempPackages.add(packages.get(j));
-                }
-            }
-
-            if (tempPackages.size() > currentTrip.size()) currentTrip = new ArrayList<>(tempPackages);
-
+            currentTrip = collectPackagesIntoTrip(packages, maximumCarryingWeight, currentTrip, tempPackages, i);
             tempPackages.clear();
         }
 
         return currentTrip;
     }
-    public static Package  readPackage(BufferedReader testCasesReader, List<Offer> offers, double baseDeliveryCost) throws IOException {
+
+    private List<Package> collectPackagesIntoTrip(List<Package> packages, double maximumCarryingWeight, List<Package> currentTrip, List<Package> tempPackages, int i) {
+        double totalWeight = packages.get(i).getWeight();
+        tempPackages.add(packages.get(i));
+        double maxWeight = 0;
+        for (int j = i + 1; j < packages.size(); j++) {
+            Package nextPackage = packages.get(j);
+
+            if (totalWeight + nextPackage.getWeight() <= maximumCarryingWeight) {
+                totalWeight += nextPackage.getWeight();
+                tempPackages.add(nextPackage);
+            } else if (totalWeight > maxWeight) {
+                maxWeight = totalWeight;
+            } else if (totalWeight < nextPackage.getWeight() && tempPackages.isEmpty()) {
+                tempPackages.add(nextPackage);
+            }
+        }
+
+        if (tempPackages.size() > currentTrip.size())
+            currentTrip = new ArrayList<>(tempPackages);
+
+        return currentTrip;
+    }
+
+    private void sortPackagesByWeightDescendingAndDistanceAscending(List<Package> packages) {
+        Collections.sort(packages, (currentPackage, Nextpackage) -> {
+            if (Nextpackage.getWeight() == currentPackage.getWeight())
+                return Double.compare(currentPackage.getDistance(), Nextpackage.getDistance());
+            return Double.compare(Nextpackage.getWeight(), currentPackage.getWeight());
+        });
+    }
+
+    public static Package readPackage(BufferedReader testCasesReader, List<Offer> offers, double baseDeliveryCost) throws IOException {
         String[] packageInfo = testCasesReader.readLine().split("\\s+");
         String pkgId = packageInfo[0];
         int weight = Integer.parseInt(packageInfo[1]);
