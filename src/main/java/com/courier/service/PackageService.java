@@ -33,7 +33,6 @@ public class PackageService {
         List<Package> currentTrip = new ArrayList<>();
         List<Package> tempPackages = new ArrayList<>();
 
-
         if (packages.size() == 1) {
             currentTrip = new ArrayList<>(packages);
             packages.removeAll(currentTrip);

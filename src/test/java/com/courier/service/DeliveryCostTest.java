@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static com.courier.service.PackageService.applyOffer;
 import static com.courier.service.PackageService.calculatePackageCost;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DeliveryCostTest {
@@ -26,13 +27,16 @@ public class DeliveryCostTest {
     }
 
     @Test
-    void whenDiscountGivenPackageCostShouldBeLessThanTotalCost() {
-        aPackage = new Package("PKG723", 100, 100, "OFR001");
+    void whenDiscountGivenTestPackageCost() {
         Offer offer = new Offer("OFR001", 10, 250, 50, 200, 7);
-        double actualCost = calculatePackageCost(aPackage, baseDeliveryCost);
+        aPackage = new Package("PKG723", 100, 100, "OFR001");
+        double actualCost =(baseDeliveryCost+(aPackage.getWeight() * 10) + (aPackage.getDistance() * 5));
+        double calculatePrice = actualCost*(1- (double) offer.getDiscountPercentage() /100);
         double offeredCost = applyOffer(aPackage, offer, baseDeliveryCost);
         assertTrue(actualCost > offeredCost);
         assertTrue(aPackage.isOfferApplied());
+
+        assertEquals(calculatePrice,offeredCost);
     }
 
 
