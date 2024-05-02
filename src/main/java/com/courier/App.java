@@ -1,64 +1,53 @@
 package com.courier;
 
-import com.courier.model.Offer;
 import com.courier.model.Package;
+import com.courier.model.Vehicle;
 import com.courier.service.PackageService;
+import com.courier.service.VehicleService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
-
-import static com.courier.service.OfferService.loadOffers;
-import static com.courier.service.PackageService.readPackage;
-import static com.courier.service.VehicleService.shipPackages;
 
 
 public class App {
     static PackageService packageService = new PackageService();
+    static VehicleService vehicleService = new VehicleService();
 
     public static void main(String[] args) throws IOException {
         String fileName = args[0];
-        InputStream inputStream = App.class.getResourceAsStream("/"+fileName);
+        InputStream inputStream = App.class.getResourceAsStream("/" + fileName);
 
-        try (BufferedReader testCasesReader = new BufferedReader(new InputStreamReader(inputStream))) {
-            List<Offer> offers = loadOffers();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
 
-            while ((line = testCasesReader.readLine()) != null) {
-                String[] offerInfo = line.split("\\s+");
-                double baseDeliveryCost = Double.parseDouble(offerInfo[0]);
-                int numberOfPackages = Integer.parseInt(offerInfo[1]);
-                Package[] packages = new Package[numberOfPackages];
+            while ((line = reader.readLine()) != null) {
+                Package[] packages = packageService.readPackages(line, reader);
+                if ((line = reader.readLine()) != null) {
+                    String[] vehicleInfo = line.split("\\s+");
+                    int numberOfVehicles = Integer.parseInt(vehicleInfo[0]);
+                    Vehicle.maximumSpeed = Integer.parseInt(vehicleInfo[1]);
+                    Vehicle.maximumCarryingWeight = Integer.parseInt(vehicleInfo[2]);
 
-                for (int i = 0; i < numberOfPackages; i++) {
-                    packages[i]=readPackage(testCasesReader, offers, baseDeliveryCost);
+                    vehicleService.shipPackages(packages, numberOfVehicles);
+
                 }
-                printPackages(packages, testCasesReader);
+                printPackages(packages);
             }
         } catch (IOException e) {
             throw new IOException(e.getMessage());
         }
+
+
     }
 
-    private static void printPackages(Package[] packages, BufferedReader testCasesReader) throws IOException {
-        String line;
-        if ((line=testCasesReader.readLine()) != null) {
-            String[] vehicleInfo = line.split("\\s+");
-            int numberOfVehicles = Integer.parseInt(vehicleInfo[0]);
-            int maximumSpeed = Integer.parseInt(vehicleInfo[1]);
-            int maximumCarryingWeight = Integer.parseInt(vehicleInfo[2]);
+    private static void printPackages(Package[] packages) {
 
-            shipPackages(packages, numberOfVehicles, maximumSpeed, maximumCarryingWeight);
-
-            for (Package orgPkg : packages) {
-                System.out.printf("%s %.0f %.0f %.2f\n", orgPkg.getId(), orgPkg.getDiscount(), orgPkg.getTotalCost(), orgPkg.getEstimatedDeliveryTime());
-            }
-        } else {
-            for (Package orgPkg : packages) {
-                System.out.printf("%s %.0f %.0f\n", orgPkg.getId(), orgPkg.getDiscount(), orgPkg.getTotalCost());
-            }
+        for (Package orgPkg : packages) {
+            System.out.printf("%s %.0f %.0f ", orgPkg.getId(), orgPkg.getDiscount(), orgPkg.getTotalCost());
+            if (orgPkg.getEstimatedDeliveryTime() != 0) System.out.printf("%.2f\n", orgPkg.getEstimatedDeliveryTime());
+            else System.out.println();
         }
         System.out.println();
     }

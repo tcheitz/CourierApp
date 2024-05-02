@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static com.courier.service.PackageService.applyOffer;
-import static com.courier.service.PackageService.calculatePackageCost;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -22,7 +21,7 @@ public class DeliveryCostTest {
     @CsvSource("0.1,0.1")
     void packageCostShouldBeMoreThanBaseCost(double weight, double distance) {
         aPackage = new Package("PKG42", weight, distance, "OFR001");
-        double cost = calculatePackageCost(aPackage, baseDeliveryCost);
+        double cost = aPackage.calculatePackageCost(baseDeliveryCost);
         assertTrue(cost > baseDeliveryCost);
     }
 
@@ -31,12 +30,10 @@ public class DeliveryCostTest {
         Offer offer = new Offer("OFR001", 10, 250, 50, 200, 7);
         aPackage = new Package("PKG723", 100, 100, "OFR001");
         double actualCost =(baseDeliveryCost+(aPackage.getWeight() * 10) + (aPackage.getDistance() * 5));
-        double calculatePrice = actualCost*(1- (double) offer.getDiscountPercentage() /100);
-        double offeredCost = applyOffer(aPackage, offer, baseDeliveryCost);
-        assertTrue(actualCost > offeredCost);
-        assertTrue(aPackage.isOfferApplied());
-
-        assertEquals(calculatePrice,offeredCost);
+        double expectedDiscount = actualCost*(1-  7.0 /100);
+        double calculatedDiscount = aPackage.calculateDiscountedCost(actualCost,offer.getDiscountPercentage());
+        assertTrue(actualCost > calculatedDiscount);
+        assertEquals(expectedDiscount,calculatedDiscount);
     }
 
 

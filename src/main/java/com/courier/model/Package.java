@@ -1,6 +1,10 @@
 package com.courier.model;
 
+import java.util.Comparator;
+import java.util.List;
+
 public class Package {
+    Offer offer;
     private String id;
     private double weight;
     private double distance;
@@ -9,7 +13,8 @@ public class Package {
     private double discount;
     private double totalCost;
     private Vehicle vehicle;
-    double estimatedDeliveryTime;
+    private double estimatedDeliveryTime;
+    private double baseCost;
 
 
     public Package(String id, double weight, double distance) {
@@ -26,6 +31,19 @@ public class Package {
         this.weight = weight;
         this.distance = distance;
         this.offerCode = offerCode;
+    }
+
+    public Package(String id, double weight, double distance, String offerCode, double baseCost) {
+        validatePackage(weight, distance);
+        this.id = id;
+        this.weight = weight;
+        this.distance = distance;
+        this.offerCode = offerCode;
+        this.baseCost = baseCost;
+        this.totalCost = calculatePackageCost(baseCost);
+        if (isOfferValid(offerCode)) {
+            applyOffer();
+        }
     }
 
     private static void validatePackage(double weight, double distance) {
@@ -53,25 +71,16 @@ public class Package {
         this.offerApplied = offerApplied;
     }
 
-    public String getOfferCode() {
-        return offerCode;
-    }
 
     public double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(double discount) {
-        this.discount = discount;
-    }
 
     public double getTotalCost() {
         return totalCost;
     }
 
-    public void setTotalCost(double totalCost) {
-        this.totalCost = totalCost;
-    }
 
     public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
@@ -84,4 +93,35 @@ public class Package {
     public void setEstimatedDeliveryTime(double estimatedDeliveryTime) {
         this.estimatedDeliveryTime = estimatedDeliveryTime;
     }
+
+    public double calculatePackageCost(double baseCost) {
+        return baseCost + (this.getWeight() * 10) + (this.getDistance() * 5);
+    }
+
+    public double calculateDiscountedCost(double totalCost, double discountPercentage) {
+        return totalCost * (1 - discountPercentage / 100);
+    }
+
+    public boolean isOfferValid(String code) {
+        offer = Offer.getOffer(code);
+        if (offer != null) {
+            return (offer.getMinimumWeight() <= this.getWeight() && offer.getMaximumWeight() >= this.getWeight() &&
+                    offer.getMinimumDistance() <= this.getDistance() && offer.getMaximumDistance() >= this.getDistance());
+        }
+        return false;
+    }
+
+    public void applyOffer() {
+        double packageCost = calculatePackageCost(this.baseCost);
+        setOfferApplied(true);
+        totalCost = (calculateDiscountedCost(packageCost, offer.getDiscountPercentage()));
+        discount = (packageCost - this.getTotalCost());
+    }
+
+    public static Package findLongestDelivery(List<Package> packageList) {
+        return packageList.stream()
+                .max(Comparator.comparing(Package::getDistance))
+                .orElseThrow(IllegalArgumentException::new);
+    }
 }
+

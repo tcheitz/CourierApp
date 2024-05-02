@@ -1,7 +1,7 @@
 package com.courier.service;
 
-import com.courier.model.Offer;
 import com.courier.model.Package;
+import com.courier.model.Vehicle;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,70 +9,73 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
+
 public class PackageService {
-    public static double calculatePackageCost(Package aPackage, double baseDeliveryCost) {
-        return baseDeliveryCost + (aPackage.getWeight() * 10) + (aPackage.getDistance() * 5);
-    }
 
-    private static double calculateDiscountedPrice(double basePrice, double discountPercentage) {
-        return basePrice * (1 - discountPercentage / 100);
-    }
 
-    public static double applyOffer(Package aPackage, Offer offer, double baseDeliveryCost) {
-        double packageCost = calculatePackageCost(aPackage, baseDeliveryCost);
-        if (offer.getMinimumWeight() <= aPackage.getWeight() && offer.getMaximumWeight() >= aPackage.getWeight() &&
-                offer.getMinimumDistance() <= aPackage.getDistance() && offer.getMaximumDistance() >= aPackage.getDistance()) {
-            aPackage.setOfferApplied(true);
-            return calculateDiscountedPrice(packageCost, offer.getDiscountPercentage());
+    public Package[] readPackages(String line, BufferedReader reader) throws IOException {
+
+        String[] offerInfo = line.split("\\s+");
+        double baseDeliveryCost = Double.parseDouble(offerInfo[0]);
+        int numberOfPackages = Integer.parseInt(offerInfo[1]);
+        Package[] packages = new Package[numberOfPackages];
+
+        for (int i = 0; i < numberOfPackages; i++) {
+            String[] packageInfo = reader.readLine().split("\\s+");
+            String pkgId = packageInfo[0];
+            int weight = Integer.parseInt(packageInfo[1]);
+            int distance = Integer.parseInt(packageInfo[2]);
+            String offerCode = packageInfo.length >= 4 ? packageInfo[3] : "NA";
+            packages[i] = new Package(pkgId, weight, distance, offerCode, baseDeliveryCost);
         }
-        return packageCost;
+        return packages;
     }
 
-    public List<Package> filterPackages(List<Package> packages, double maximumCarryingWeight) {
 
-        List<Package> currentTrip = new ArrayList<>();
-        List<Package> tempPackages = new ArrayList<>();
+    public List<Package> filterPackages(List<Package> packages) {
+
+        List<Package> currentTrip = new ArrayList<>(packages);
 
         if (packages.size() == 1) {
-            currentTrip = new ArrayList<>(packages);
             packages.removeAll(currentTrip);
             return currentTrip;
         }
 
-        sortPackagesByWeightDescendingAndDistanceAscending(packages);
+        sortPackages(packages);
+        currentTrip=tagPackages(packages);
+        return currentTrip;
+    }
 
+    private List<Package> tagPackages(List<Package> packages) {
+        List<Package> currentTrip =new ArrayList<>();
+        List<Package> tempPackages = new ArrayList<>();
         for (int i = 0; i < packages.size(); i++) {
-            currentTrip = collectPackagesIntoTrip(packages, maximumCarryingWeight, currentTrip, tempPackages, i);
-            tempPackages.clear();
-        }
+            double totalWeight = packages.get(i).getWeight();
+            tempPackages.add(packages.get(i));
+            double maxWeight = 0;
+            for (int j = i + 1; j < packages.size(); j++) {
+                Package nextPackage = packages.get(j);
 
-        return currentTrip;
-    }
-
-    private List<Package> collectPackagesIntoTrip(List<Package> packages, double maximumCarryingWeight, List<Package> currentTrip, List<Package> tempPackages, int i) {
-        double totalWeight = packages.get(i).getWeight();
-        tempPackages.add(packages.get(i));
-        double maxWeight = 0;
-        for (int j = i + 1; j < packages.size(); j++) {
-            Package nextPackage = packages.get(j);
-
-            if (totalWeight + nextPackage.getWeight() <= maximumCarryingWeight) {
-                totalWeight += nextPackage.getWeight();
-                tempPackages.add(nextPackage);
-            } else if (totalWeight > maxWeight) {
-                maxWeight = totalWeight;
-            } else if (totalWeight < nextPackage.getWeight() && tempPackages.isEmpty()) {
-                tempPackages.add(nextPackage);
+                if (totalWeight + nextPackage.getWeight() <= Vehicle.maximumCarryingWeight) {
+                    totalWeight += nextPackage.getWeight();
+                    tempPackages.add(nextPackage);
+                } else if (totalWeight > maxWeight) {
+                    maxWeight = totalWeight;
+                } else if (totalWeight < nextPackage.getWeight() && tempPackages.isEmpty()) {
+                    tempPackages.add(nextPackage);
+                }
             }
+
+            if (tempPackages.size() > currentTrip.size())
+                currentTrip = new ArrayList<>(tempPackages);
+            tempPackages.clear();
+
         }
-
-        if (tempPackages.size() > currentTrip.size())
-            currentTrip = new ArrayList<>(tempPackages);
-
         return currentTrip;
     }
 
-    private void sortPackagesByWeightDescendingAndDistanceAscending(List<Package> packages) {
+    private void sortPackages(List<Package> packages) {
         Collections.sort(packages, (currentPackage, Nextpackage) -> {
             if (Nextpackage.getWeight() == currentPackage.getWeight())
                 return Double.compare(currentPackage.getDistance(), Nextpackage.getDistance());
@@ -80,35 +83,24 @@ public class PackageService {
         });
     }
 
-    public static Package readPackage(BufferedReader testCasesReader, List<Offer> offers, double baseDeliveryCost) throws IOException {
-        String[] packageInfo = testCasesReader.readLine().split("\\s+");
-        String pkgId = packageInfo[0];
-        int weight = Integer.parseInt(packageInfo[1]);
-        int distance = Integer.parseInt(packageInfo[2]);
-        String offerCode = packageInfo.length >= 4 ? packageInfo[3] : "";
-        double totalCost = baseDeliveryCost;
-        double discount = 0;
-        Package pkg;
+    public void loadPackages(Vehicle vehicle, List<Package> currentTripPackageList, Package[] packages) {
+        List<Package> packageList = filterPackages(currentTripPackageList);
+        vehicle.setPackages(packageList);
 
-        if (offerCode != "") {
-            pkg = new Package(pkgId, weight, distance, offerCode);
-            for (Offer offer : offers) {
-                if (offer.getCode().equals(pkg.getOfferCode())) {
-                    totalCost = applyOffer(pkg, offer, baseDeliveryCost);
-                    discount = calculatePackageCost(pkg, baseDeliveryCost) - totalCost;
+        Package longestDelivery = Package.findLongestDelivery(packageList);
+
+        for (Package aPackage : packageList) {
+            for (Package originalPackage : packages) {
+                if (aPackage.getId() == originalPackage.getId()) {
+                    originalPackage.setVehicle(vehicle);
+                    originalPackage.setEstimatedDeliveryTime(VehicleService.currentTime + originalPackage.getDistance() / Vehicle.maximumSpeed);
                     break;
                 }
             }
-        } else {
-            pkg = new Package(pkgId, weight, distance);
+            currentTripPackageList.removeIf(pkg -> pkg.getId() == aPackage.getId());
         }
 
-        if (!pkg.isOfferApplied())
-            totalCost = calculatePackageCost(pkg, baseDeliveryCost);
+        vehicle.setReturnTime(VehicleService.currentTime + 2 * (longestDelivery.getDistance() / Vehicle.maximumSpeed));
 
-        pkg.setDiscount(discount);
-        pkg.setTotalCost(totalCost);
-
-        return pkg;
     }
 }
