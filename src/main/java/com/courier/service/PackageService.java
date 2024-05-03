@@ -6,9 +6,7 @@ import com.courier.model.Vehicle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
 
 
 public class PackageService {
@@ -42,13 +40,13 @@ public class PackageService {
             return currentTrip;
         }
 
-        sortPackages(packages);
-        currentTrip=tagPackages(packages);
+        Package.sortPackages(packages);
+        currentTrip = tagPackages(packages);
         return currentTrip;
     }
 
     private List<Package> tagPackages(List<Package> packages) {
-        List<Package> currentTrip =new ArrayList<>();
+        List<Package> currentTrip = new ArrayList<>();
         List<Package> tempPackages = new ArrayList<>();
         for (int i = 0; i < packages.size(); i++) {
             double totalWeight = packages.get(i).getWeight();
@@ -75,13 +73,6 @@ public class PackageService {
         return currentTrip;
     }
 
-    private void sortPackages(List<Package> packages) {
-        Collections.sort(packages, (currentPackage, Nextpackage) -> {
-            if (Nextpackage.getWeight() == currentPackage.getWeight())
-                return Double.compare(currentPackage.getDistance(), Nextpackage.getDistance());
-            return Double.compare(Nextpackage.getWeight(), currentPackage.getWeight());
-        });
-    }
 
     public void loadPackages(Vehicle vehicle, List<Package> currentTripPackageList, Package[] packages) {
         List<Package> packageList = filterPackages(currentTripPackageList);

@@ -1,5 +1,6 @@
 package com.courier.model;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -122,6 +123,13 @@ public class Package {
         return packageList.stream()
                 .max(Comparator.comparing(Package::getDistance))
                 .orElseThrow(IllegalArgumentException::new);
+    }
+    public static void sortPackages(List<Package> packages) {
+        Collections.sort(packages, (currentPackage, Nextpackage) -> {
+            if (Nextpackage.getWeight() == currentPackage.getWeight())
+                return Double.compare(currentPackage.getDistance(), Nextpackage.getDistance());
+            return Double.compare(Nextpackage.getWeight(), currentPackage.getWeight());
+        });
     }
 }
 
