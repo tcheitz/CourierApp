@@ -18,14 +18,6 @@ public class Package {
     private double baseCost;
 
 
-    public Package(String id, double weight, double distance) {
-        validatePackage(weight, distance);
-        this.id = id;
-        this.weight = weight;
-        this.distance = distance;
-    }
-
-
     public Package(String id, double weight, double distance, String offerCode) {
         validatePackage(weight, distance);
         this.id = id;

@@ -96,9 +96,9 @@ public class FilteringPackageTests {
     @Test
     void shouldFilterLeastDistanceIfEqualWeights() {
         List<Package> packages = new ArrayList<>();
-        packages.add(new Package("PKG1", 50, 50));
-        packages.add(new Package("PKG2", 50, 120));
-        packages.add(new Package("PKG3", 50, 100));
+        packages.add(new Package("PKG1", 50, 50,"NA"));
+        packages.add(new Package("PKG2", 50, 120,"NA"));
+        packages.add(new Package("PKG3", 50, 100,"NA"));
         maximumCarryingWeight = 130;
         String[] packageIds = {"PKG1", "PKG3", "PKG2"};
         List<String> filteredPackageIds = new ArrayList<>();

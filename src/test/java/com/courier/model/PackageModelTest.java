@@ -16,10 +16,6 @@ public class PackageModelTest {
         });
         assertEquals("Weight, distance values should be more than zero",exception.getMessage());
 
-        Throwable exception1 = assertThrows(IllegalArgumentException.class, () -> {
-            aPackage = new Package("PKG1",40,-10);
-        });
-        assertEquals("Weight, distance values should be more than zero",exception.getMessage());
     }
     @Test
     void assertThrowsIllegalArgumentException() {
