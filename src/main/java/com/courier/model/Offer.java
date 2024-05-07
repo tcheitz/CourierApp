@@ -11,7 +11,7 @@ public class Offer {
     private int minimumWeight;
     private int maximumWeight;
     private int discountPercentage;
-     static List<Offer> offerList = loadOffers();
+    static List<Offer> offerList = loadOffers();
     public Offer(String code, int minimumDistance, int maximumDistance, int minimumWeight, int maximumWeight, int discountPercentage) {
         this.code = code;
         if (minimumDistance < 0 || maximumDistance < 0 || minimumWeight < 0 || maximumWeight < 0 || discountPercentage < 0)

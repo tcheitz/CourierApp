@@ -42,7 +42,7 @@ public class PackageModelTest {
         assertDoesNotThrow(()->new Package("PKG62",0.8,0.56,"OFR022"));
     }
     @Test
-    void intiallyOfferShouldNotBeApplied(){
+    void initiallyOfferShouldNotBeApplied(){
         aPackage = new Package("PKG378",78,67,"OFR003");
         assertFalse(aPackage.isOfferApplied());
     }

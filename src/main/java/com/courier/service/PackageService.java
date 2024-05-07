@@ -51,16 +51,11 @@ public class PackageService {
         for (int i = 0; i < packages.size(); i++) {
             double totalWeight = packages.get(i).getWeight();
             tempPackages.add(packages.get(i));
-            double maxWeight = 0;
             for (int j = i + 1; j < packages.size(); j++) {
                 Package nextPackage = packages.get(j);
 
                 if (totalWeight + nextPackage.getWeight() <= Vehicle.maximumCarryingWeight) {
                     totalWeight += nextPackage.getWeight();
-                    tempPackages.add(nextPackage);
-                } else if (totalWeight > maxWeight) {
-                    maxWeight = totalWeight;
-                } else if (totalWeight < nextPackage.getWeight() && tempPackages.isEmpty()) {
                     tempPackages.add(nextPackage);
                 }
             }
